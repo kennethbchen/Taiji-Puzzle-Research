@@ -1,4 +1,6 @@
 from ursina import *
+from Node import Node
+from Edge import Edge
 
 layers = [
     [
@@ -28,12 +30,30 @@ layers = [
 
 ]
 
-layer_colors = [color.blue, color.green, color.red]
+layers = [
+    [
+        [1, 2, 2, 2],
+        [1, 1, 2, 3],
+    ],
+    [
+        [1, 1, 2, 2],
+        [1, 2, 2, 2],
+    ],
+    [
+        [1, 1, 1, 1],
+        [2, 2, 2, 1],
+    ],
+]
+
+layer_colors = [color.red, color.green, color.blue]
 
 tiles = {}
+edges = []
 
 spacing = 1.5
 
+app = Ursina()
+camera = EditorCamera()
 
 # Setup
 for layer_i, layer in enumerate(layers):
@@ -41,10 +61,10 @@ for layer_i, layer in enumerate(layers):
     # Create node objects
     for row in range(0, len(layer)):
         for col in range(0, len(layer[row])):
-            tiles[(col, row, layer_i)] = Entity(model="sphere", color=layer_colors[layer_i], scale=Vec3(0.5,0.5,0.5), position=Vec3(col * spacing, layer_i * spacing, row * spacing))
+            tiles[(col, row, layer_i)] = Node(col=col, row=row, layer=layer_i, region=layer[row][col], model="sphere", color=layer_colors[layer_i], scale=Vec3(0.5, 0.5, 0.5), position=Vec3(col * spacing, layer_i * spacing, row * spacing))
 
-    """
-    # Add neighbors to tiles
+
+    # Add neighbors
     for i, (key, tile) in enumerate(tiles.items()):
 
         neighbors = [
@@ -55,13 +75,15 @@ for layer_i, layer in enumerate(layers):
         ]
 
         for neighbor in neighbors:
-            if tiles.has_key(neighbor):
+            if neighbor in tiles:
                 tile.add_neighbor(tiles[neighbor])
-    """
 
 
-app = Ursina()
+# Axes
+x_axis = Entity(model=Pipe(path=((-1, -1, -1), (10, -1, -1)), thicknesses=(0.1, 0.1)), color=color.red)
+y_axis = Entity(model=Pipe(path=((-1, -1, -1), (-1, 10, -1)), thicknesses=(0.1, 0.1)), color=color.green)
+z_axis = Entity(model=Pipe(path=((-1, -1, -1), (-1, -1, 10)), thicknesses=(0.1, 0.1), cap_ends=False), color=color.blue)
 
-camera = EditorCamera()
+
 
 app.run()
