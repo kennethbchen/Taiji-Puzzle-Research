@@ -1,13 +1,14 @@
 from ortools.sat.python import cp_model
 
-model = cp_model.CpModel()
-
-symbols = 8
-region_capacity = 2
 
 # All boards should be the same size
 # Each cell in a board has an integer which represents its region id
 # cells that have the same region id are considered in the same region
+
+"""
+symbols = 8
+region_capacity = 2
+
 boards = [
     [
         [1, 1, 1, 1, 1, 4],
@@ -34,8 +35,60 @@ boards = [
         [5, 1, 1, 1, 6, 6],
     ]
 ]
+"""
+
+
+# 8-queens
+symbols = 8
+region_capacity = 1
+
+boards = [
+    [
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2],
+        [3, 3, 3, 3, 3, 3, 3, 3],
+        [4, 4, 4, 4, 4, 4, 4, 4],
+        [5, 5, 5, 5, 5, 5, 5, 5],
+        [6, 6, 6, 6, 6, 6, 6, 6],
+        [7, 7, 7, 7, 7, 7, 7, 7],
+        [8, 8, 8, 8, 8, 8, 8, 8]
+
+    ],
+    [
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+        [1, 2, 3, 4, 5, 6, 7, 8],
+    ],
+    [
+        [1,   2,  3,  4,  5,  6, 7, 8],
+        [9,   1,  2,  3,  4,  5, 6, 7],
+        [10,  9,  1,  2,  3,  4, 5, 6],
+        [11, 10,  9,  1,  2,  3, 4, 5],
+        [12, 11, 10,  9,  1,  2, 3, 4],
+        [13, 12, 11, 10,  9,  1, 2, 3],
+        [14, 13, 12, 11, 10,  9, 1, 2],
+        [15, 14, 13, 12, 11, 10, 9, 1],
+    ],
+    [
+        [15, 14, 13, 12, 11, 10, 9, 8],
+        [14, 13, 12, 11, 10,  9, 8, 7],
+        [13, 12, 11, 10,  9,  8, 7, 6],
+        [12, 11, 10, 9,   8,  7, 6, 5],
+        [11, 10, 9,  8,   7,  6, 5, 4],
+        [10, 9,  8,  7,   6,  5, 4, 3],
+        [9,  8,  7,  6,   5,  4, 3, 2],
+        [8,  7,  6,  5,   4,  3, 2, 1]
+    ]
+]
 
 rows, cols = len(boards[0]), len(boards[0][0])
+
+model = cp_model.CpModel()
 
 # Create grid of cells based on board dimensions
 cells = []
@@ -63,7 +116,10 @@ for board_idx in range(len(boards)):
 
 print("Regions:", regions)
 
-for i, (region, region_cells) in enumerate(regions.items()):
+for i, (region_id, region_cells) in enumerate(regions.items()):
+
+    for cell in region_cells:
+        model.Add(cell == 0).OnlyEnforceIf(len(region_cells) < region_capacity)
 
     left_or_var = model.NewBoolVar('')
     right_or_var = model.NewBoolVar('')
