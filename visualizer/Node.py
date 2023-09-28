@@ -3,7 +3,7 @@ from ursina import Entity
 
 class Node(Entity):
     def __init__(self, col, row, region, layer, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(add_to_scene_entities=False, **kwargs)
         self.col = col
         self.row = row
         self.layer = layer
@@ -27,8 +27,7 @@ class Node(Entity):
         return (self.col, self.layer, self.row)
 
     def should_have_edge(self, node):
-        return (self.col < node.col and self.row <= node.row) or (self.col <= node.col and self.row < node.row)
+        return (self.col < node.col or self.row < node.row) and self.region == node.region
 
     def __str__(self):
-        return "Node at ({col},{layer},{row}) in region {}"
         return "Node at (" + str(self.col) + ", " + str(self.row) + ") in region " + str(self.region)
