@@ -1,9 +1,7 @@
-from ursina import Entity
 
+class Node():
+    def __init__(self, col, row, region, layer):
 
-class Node(Entity):
-    def __init__(self, col, row, region, layer, **kwargs):
-        super().__init__(add_to_scene_entities=False, **kwargs)
         self.col = col
         self.row = row
         self.layer = layer

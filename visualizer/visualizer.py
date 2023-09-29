@@ -1,4 +1,6 @@
-from ursina import *
+from vedo import show, Spheres, Lines
+
+
 from Node import Node
 from Edge import Edge
 
@@ -46,17 +48,13 @@ layerss = [
 
 ]
 
+layer_colors = ["red", "green", "blue"]
 
-
-layer_colors = [color.red, color.green, color.blue]
-
-tiles = {}
-edges = []
+node_data = {}
+edge_data = []
+symbol_data = [(0, 1), (1, 1)]
 
 spacing = 1.5
-
-app = Ursina(borderless=False)
-camera = EditorCamera()
 
 # Setup
 for layer_i, layer in enumerate(layers):
@@ -64,11 +62,11 @@ for layer_i, layer in enumerate(layers):
     # Create node objects
     for row in range(0, len(layer)):
         for col in range(0, len(layer[row])):
-            tiles[(col, layer_i, row)] = Node(col=col, row=row, region=layer[row][col], layer=layer_i, model="sphere", color=layer_colors[layer_i], scale=Vec3(0.5, 0.5, 0.5), position=Vec3(col * spacing, layer_i * spacing, row * spacing))
+            node_data[(col, layer_i, row)] = Node(col=col, row=row, region=layer[row][col], layer=layer_i)
 
 
 # Add neighbors
-for i, (key, tile) in enumerate(tiles.items()):
+for i, (key, tile) in enumerate(node_data.items()):
 
     neighbors = [
         (tile.col - 1, tile.layer, tile.row),
@@ -79,20 +77,31 @@ for i, (key, tile) in enumerate(tiles.items()):
 
     for neighbor in neighbors:
 
-        if neighbor in tiles:
+        if neighbor in node_data:
 
-            tile.add_neighbor(tiles[neighbor])
+            tile.add_neighbor(node_data[neighbor])
 
-            if tile.should_have_edge(tiles[neighbor]):
-                edges.append(Edge(tile, tiles[neighbor]))
-
-
-print(len(edges))
-
-# Axes
-x_axis = Entity(model=Pipe(path=((-1, -1, -1), (10, -1, -1)), thicknesses=(0.1, 0.1)), color=color.red)
-y_axis = Entity(model=Pipe(path=((-1, -1, -1), (-1, 10, -1)), thicknesses=(0.1, 0.1)), color=color.green)
-z_axis = Entity(model=Pipe(path=((-1, -1, -1), (-1, -1, 10)), thicknesses=(0.1, 0.1), cap_ends=False), color=color.blue)
+            if tile.should_have_edge(node_data[neighbor]):
+                edge_data.append(Edge(tile, node_data[neighbor]))
 
 
-app.run()
+# Visualize
+
+n_centers = []
+n_colors = []
+
+for node in node_data.values():
+    n_centers.append(node.coordinates())
+    n_colors.append(layer_colors[node.layer])
+
+e_endpoints = []
+e_colors = []
+for edge in edge_data:
+    e_endpoints.append(edge.endpoints())
+    e_colors.append('white')
+
+edges = Lines(start_pts=e_endpoints, res=0, lw=5, c="black", alpha=1)
+nodes = Spheres(centers=n_centers, r=0.2, c=n_colors, alpha=1)
+
+show(edges, nodes, at=0, axes=1, bg="gray").interactive().close()
+exit()
