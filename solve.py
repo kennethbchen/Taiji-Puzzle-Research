@@ -5,7 +5,7 @@ from ortools.sat.python import cp_model
 # Each cell in a board has an integer which represents its region id
 # cells that have the same region id are considered in the same region
 
-"""
+
 symbols = 8
 region_capacity = 2
 
@@ -35,9 +35,9 @@ boards = [
         [5, 1, 1, 1, 6, 6],
     ]
 ]
+
+
 """
-
-
 # 8-queens
 symbols = 8
 region_capacity = 1
@@ -85,6 +85,7 @@ boards = [
         [8,  7,  6,  5,   4,  3, 2, 1]
     ]
 ]
+"""
 
 rows, cols = len(boards[0]), len(boards[0][0])
 
@@ -142,10 +143,10 @@ if status == cp_model.FEASIBLE or status == cp_model.OPTIMAL:
                 print('_', end='')
         print()
 
-    print("\nCoordinates (row, col): ")
+    print("\nCoordinates (col, row): ")
     for i in range(rows):
         for j in range(cols):
             if solver.Value(cells[i][j]):
-                print(f'({i},{j})')
+                print(f'({j}, {i}),')
 else:
     print('No solution found')
