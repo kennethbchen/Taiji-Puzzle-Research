@@ -1,6 +1,7 @@
 from vedo import show, Spheres, Lines, Plotter, Sphere, Line
 from Node import Node
 from Edge import Edge
+from puzzles import puzzles
 
 """
     Coordinate System:
@@ -8,107 +9,25 @@ from Edge import Edge
     +y - up
     +z - backwards
     
-    In relation to layer data:
+    In relation to board data:
     x-axis: columns
-    y-axis: layers
+    y-axis: boards
     z-axis: rows
     
-    (x, y, z) -> (column, layer, row)
+    (x, y, z) -> (column, board, row)
 """
-layers = [
-    [
-        [1, 1, 1, 1, 1, 4],
-        [2, 2, 2, 2, 1, 4],
-        [2, 3, 3, 2, 1, 4],
-        [2, 3, 4, 1, 1, 4],
-        [2, 3, 4, 4, 4, 4],
-        [2, 3, 3, 3, 3, 3],
-    ],
-    [
-        [1, 1, 1, 1, 1, 2],
-        [3, 3, 3, 3, 1, 2],
-        [3, 3, 3, 4, 2, 2],
-        [5, 3, 4, 4, 4, 2],
-        [5, 3, 3, 3, 3, 6],
-        [5, 5, 3, 3, 7, 8],
-    ],
-    [
-        [1, 1, 1, 2, 2, 7],
-        [1, 2, 2, 2, 8, 9],
-        [1, 2, 3, 3, 10, 11],
-        [1, 1, 4, 4, 1, 6],
-        [5, 1, 4, 1, 1, 6],
-        [5, 1, 1, 1, 6, 6],
-    ],
 
-]
-
-layerss = [
-    [
-        [1, 2, 2, 2],
-        [1, 1, 2, 3],
-    ],
-    [
-        [1, 1, 2, 2],
-        [1, 2, 2, 2],
-    ],
-    [
-        [1, 1, 1, 1],
-        [2, 2, 2, 1],
-    ],
-
-]
-
-layerss = [
-    [
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [2, 2, 2, 2, 2, 2, 2, 2],
-        [3, 3, 3, 3, 3, 3, 3, 3],
-        [4, 4, 4, 4, 4, 4, 4, 4],
-        [5, 5, 5, 5, 5, 5, 5, 5],
-        [6, 6, 6, 6, 6, 6, 6, 6],
-        [7, 7, 7, 7, 7, 7, 7, 7],
-        [8, 8, 8, 8, 8, 8, 8, 8]
-
-    ],
-    [
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-        [1, 2, 3, 4, 5, 6, 7, 8],
-    ],
-    [
-        [1,   2,  3,  4,  5,  6, 7, 8],
-        [9,   1,  2,  3,  4,  5, 6, 7],
-        [10,  9,  1,  2,  3,  4, 5, 6],
-        [11, 10,  9,  1,  2,  3, 4, 5],
-        [12, 11, 10,  9,  1,  2, 3, 4],
-        [13, 12, 11, 10,  9,  1, 2, 3],
-        [14, 13, 12, 11, 10,  9, 1, 2],
-        [15, 14, 13, 12, 11, 10, 9, 1],
-    ],
-    [
-        [15, 14, 13, 12, 11, 10, 9, 8],
-        [14, 13, 12, 11, 10,  9, 8, 7],
-        [13, 12, 11, 10,  9,  8, 7, 6],
-        [12, 11, 10, 9,   8,  7, 6, 5],
-        [11, 10, 9,  8,   7,  6, 5, 4],
-        [10, 9,  8,  7,   6,  5, 4, 3],
-        [9,  8,  7,  6,   5,  4, 3, 2],
-        [8,  7,  6,  5,   4,  3, 2, 1]
-    ]
-]
+selected_puzzle = "taiji"
+symbols = puzzles[selected_puzzle]["symbols"]
+region_capacity = puzzles[selected_puzzle]["region_capacity"]
+boards = puzzles[selected_puzzle]["boards"]
 
 layer_colors = ["red", "green", "blue", "cyan", "magenta"]
 
 dimensions = {
-    "rows": len(layers[0]),
-    "cols": len(layers[0][0]),
-    "layers": len(layers)
+    "rows": len(boards[0]),
+    "cols": len(boards[0][0]),
+    "boards": len(boards)
 }
 
 node_data = {}
@@ -118,7 +37,7 @@ symbol_data = [(3, 0), (4, 0), (2, 2), (3, 2), (0, 3), (2, 3), (2, 4), (1, 5)]
 
 
 # Setup
-for layer_i, layer in enumerate(layers):
+for layer_i, layer in enumerate(boards):
 
     # Create node objects
     for row in range(0, len(layer)):
@@ -193,7 +112,7 @@ def add_symbol(row, col):
         return False
 
     line_start = (row, 0, col)
-    line_end = (row, dimensions["layers"] - 0.5, col)
+    line_end = (row, dimensions["boards"] - 0.5, col)
 
     l = Line(p0=line_start, p1=line_end, res=0, lw=5, c="white", alpha=1)
     symbols[(row, col)] = l
