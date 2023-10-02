@@ -17,9 +17,7 @@ from puzzles import puzzles
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "taiji"
-symbols = puzzles[selected_puzzle]["symbols"]
-region_capacity = puzzles[selected_puzzle]["region_capacity"]
+selected_puzzle = "sudoku"
 boards = puzzles[selected_puzzle]["boards"]
 
 layer_colors = ["red", "green", "blue", "cyan", "magenta"]
