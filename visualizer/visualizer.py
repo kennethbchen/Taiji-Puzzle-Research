@@ -33,8 +33,7 @@ edge_data = []
 symbol_data = [(6, 0), (4, 1), (2, 2), (0, 3), (5, 4), (7, 5), (1, 6), (3, 7)]
 
 
-
-# Setup
+# ----- Setup Boards -----
 for layer_i, layer in enumerate(boards):
 
     # Create node objects
@@ -43,27 +42,34 @@ for layer_i, layer in enumerate(boards):
             node_data[(col, layer_i, row)] = Node(col=col, row=row, region=layer[row][col], layer=layer_i)
 
 
-# Add neighbors
+# ----- Add neighbors -----
 for i, (key, tile) in enumerate(node_data.items()):
 
     neighbors = [
+        # Cardinals
         (tile.col - 1, tile.layer, tile.row),
         (tile.col + 1,  tile.layer, tile.row),
         (tile.col, tile.layer, tile.row - 1),
         (tile.col, tile.layer, tile.row + 1),
+
+        # Diagonals
+        (tile.col - 1, tile.layer, tile.row - 1),
+        (tile.col + 1, tile.layer, tile.row + 1),
+        (tile.col - 1, tile.layer, tile.row + 1),
+        (tile.col + 1, tile.layer, tile.row - 1)
     ]
 
+    # Create edges between neighbors
     for neighbor in neighbors:
-
         if neighbor in node_data:
-
             tile.add_neighbor(node_data[neighbor])
 
             if tile.should_have_edge(node_data[neighbor]):
                 edge_data.append(Edge(tile, node_data[neighbor]))
 
 
-# Visualize
+# ----- Visualize -----
+
 plot = Plotter(axes=1, bg="gray")
 
 
