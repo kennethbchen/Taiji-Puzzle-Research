@@ -17,7 +17,7 @@ from puzzles import puzzles
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "sudoku"
+selected_puzzle = "8queens"
 boards = puzzles[selected_puzzle]["boards"]
 
 layer_colors = ["red", "green", "blue", "cyan", "magenta"]
@@ -30,7 +30,7 @@ dimensions = {
 
 node_data = {}
 edge_data = []
-symbol_data = [(3, 0), (4, 0), (2, 2), (3, 2), (0, 3), (2, 3), (2, 4), (1, 5)]
+symbol_data = [(6, 0), (4, 1), (2, 2), (0, 3), (5, 4), (7, 5), (1, 6), (3, 7)]
 
 
 
