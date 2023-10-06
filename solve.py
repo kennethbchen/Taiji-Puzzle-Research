@@ -1,6 +1,7 @@
 from ortools.sat.python import cp_model
 from puzzles import puzzles
 import time
+import pandas
 
 
 selected_puzzle = "test2"
@@ -15,71 +16,61 @@ rows, cols = len(boards[0]), len(boards[0][0])
 
 model = cp_model.CpModel()
 
-"""
-# Create grid of cells based on board dimensions
-cells = []
-for i in range(rows):
-    row_idx = []
-    for j in range(cols):
-        row_idx.append(model.NewBoolVar(f'cell_{i}_{j}'))
-    cells.append(row_idx)
-"""
-
 # ----- Read Region Data -----
-regions = {}
-model_vars = {}
+var_df = pandas.DataFrame(columns=["color", "board", "region_id", "row", "col", "var"])
 
-# Divide the boards into separate regions based on region id and board
-
+# Each variable in the model is distinguished by its unique combination of color, board, row, and col
 for color_idx in range(len(symbols)):
     for board_idx in range(len(boards)):
         for row_idx in range(len(boards[board_idx])):
             for col_idx in range(len(boards[board_idx][row_idx])):
 
-                # Naming: color(y)_board(x)_region(z)
-                region_key = f'b{board_idx}_c{color_idx}_r{boards[board_idx][row_idx][col_idx]}'
+                row = {}
 
-                cell_key = (color_idx, board_idx, col_idx, row_idx)
+                var_name = (color_idx, board_idx, col_idx, row_idx)
 
-                # Naming: (color, board, col, row)
-                value = model.NewBoolVar(str(cell_key))
+                row["region_id"] = boards[board_idx][row_idx][col_idx]
+                row["board"] = board_idx
+                row["color"] = color_idx
+                row["row"] = row_idx
+                row["col"] = col_idx
+                row["var"] = model.NewBoolVar(str(var_name))
 
-                if region_key not in regions:
-                    regions[region_key] = []
+                var_df.loc[len(var_df)] = row
 
-                regions[region_key].append(value)
-                model_vars[cell_key] = value
-
-print("Regions:", regions)
-print("Model Vars:", model_vars)
-exit()
 # ----- Configure Model Constraints -----
 
 # Each region (regardless of color) has either [region_capacity] or 0 symbols in it
-for i, (region_id, region_cells) in enumerate(regions.items()):
+# Each region can be identified by their unique combination of color, board, and region_id
+# cells with the same combination are in the same region
+for name, group in var_df.groupby(["color", "board", "region_id"]):
+
+    group_vars = group["var"].tolist()
 
     left_or_var = model.NewBoolVar('')
     right_or_var = model.NewBoolVar('')
     model.AddBoolXOr([left_or_var, right_or_var])
-    model.Add(sum(region_cells) == region_capacity).OnlyEnforceIf(left_or_var)
-    model.Add(sum(region_cells) == 0).OnlyEnforceIf(right_or_var)
+    model.Add(sum(group_vars) == region_capacity).OnlyEnforceIf(left_or_var)
+    model.Add(sum(group_vars) == 0).OnlyEnforceIf(right_or_var)
 
-# Each cell (col+row pair) may only have one symbol (of any color) in it
+# Each grid cell (col+row pair) may only have at most one symbol (of any color) in it
+for name, group in var_df.groupby(["col", "row"]):
 
-for row_idx in range(len(boards[board_idx])):
-    for col_idx in range(len(boards[board_idx][row_idx])):
+    group_vars = group["var"].tolist()
 
-        pair_cells = []
-
-        for board_idx in range(len(boards)):
-            for color_idx in range(len(symbols)):
-                pair_cells.append(model_vars[(color_idx, board_idx, col_idx, row_idx)])
-
-        model.Add(sum(pair_cells) <= 1)
+    model.Add(sum(group_vars) <= 1)
 
 # Each colored symbol must appear as many times as defined in symbols
+for name, group in var_df.groupby("color"):
 
-model.Add(sum([c for row in model_vars for c in row]) == symbols)
+
+    color_id = group["color"].iloc[0]
+
+    group_vars = group["var"].tolist()
+
+    model.Add(sum(group_vars) == symbols[color_id])
+
+exit()
 
 
 # ----- Configure Solver -----
