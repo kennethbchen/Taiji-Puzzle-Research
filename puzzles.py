@@ -3,7 +3,7 @@
 # cells that have the same region id are considered in the same region
 puzzles = {
     "taiji": {
-        "symbols": 8,
+        "symbols": [8],
         "region_capacity": 2,
         "boards": [
             [
@@ -33,7 +33,7 @@ puzzles = {
         ]
     },
     "8queens": {
-        "symbols": 8,
+        "symbols": [8],
         "region_capacity": 1,
         "boards": [
             [
@@ -138,11 +138,11 @@ puzzles = {
                 ]
     },
     "test2": {
-            "symbols": [2, 2],
+            "symbols": [2],
             "region_capacity": 2,
             "boards": [
                     [
-                        [1, 2, 3, 2],
+                        [1, 2, 3, 3],
                         [1, 2, 2, 3],
                         [1, 2, 2, 3]
                     ],

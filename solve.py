@@ -32,12 +32,14 @@ for color_idx in range(len(symbols)):
                 row["region_id"] = boards[board_idx][row_idx][col_idx]
                 row["board"] = board_idx
                 row["color"] = color_idx
-                row["row"] = row_idx
                 row["col"] = col_idx
+                row["row"] = row_idx
                 row["var"] = model.NewBoolVar(str(var_name))
 
                 var_df.loc[len(var_df)] = row
 
+print(var_df["var"])
+print()
 # ----- Configure Model Constraints -----
 
 # Each region (regardless of color) has either [region_capacity] or 0 symbols in it
@@ -46,12 +48,14 @@ for color_idx in range(len(symbols)):
 for name, group in var_df.groupby(["color", "board", "region_id"]):
 
     group_vars = group["var"].tolist()
+    print(group)
 
     left_or_var = model.NewBoolVar('')
     right_or_var = model.NewBoolVar('')
     model.AddBoolXOr([left_or_var, right_or_var])
     model.Add(sum(group_vars) == region_capacity).OnlyEnforceIf(left_or_var)
     model.Add(sum(group_vars) == 0).OnlyEnforceIf(right_or_var)
+
 
 # Each grid cell (col+row pair) may only have at most one symbol (of any color) in it
 for name, group in var_df.groupby(["col", "row"]):
@@ -63,29 +67,34 @@ for name, group in var_df.groupby(["col", "row"]):
 # Each colored symbol must appear as many times as defined in symbols
 for name, group in var_df.groupby("color"):
 
-
     color_id = group["color"].iloc[0]
 
     group_vars = group["var"].tolist()
 
     model.Add(sum(group_vars) == symbols[color_id])
 
-exit()
+
 
 
 # ----- Configure Solver -----
 
-""""
+
 class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
     # https://developers.google.com/optimization/scheduling/employee_scheduling#python_10
 
-    def __init__(self, cells):
+    def __init__(self, variables: pandas.DataFrame, rows, cols):
         cp_model.CpSolverSolutionCallback.__init__(self)
 
-        self.cells = cells
+        self.variables = variables
+        self.rows = rows
+        self.cols = cols
+
         self.__solution_count = 0
         self.__start_time = time.time()
+
+
+
 
     def on_solution_callback(self):
 
@@ -96,31 +105,37 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
         )
         self.__solution_count += 1
 
-        for i in range(rows):
-            for j in range(cols):
-                if self.Value(cells[i][j]):
-                    print('O', end='')
-                else:
-                    print('_', end='')
-            print()
+        # Get only variables that have a symbol
+        df = self.variables
+        placements = df[df.apply(lambda val: self.Value(val["var"]) == 1, axis=1)]
 
-        print("\nCoordinates (col, row): ")
+        color_map = {}
+
+        for item in placements[["color", "row", "col"]].values:
+
+            color_map[(item[2], item[1])] = item[0]
 
         one_line = ""
-        for i in range(rows):
-            for j in range(cols):
-                if self.Value(cells[i][j]):
-                    one_line += f"({j}, {i}), "
-                    print(f'({j}, {i}),')
-        print("\n")
+        for r in range(self.rows):
+            for c in range(self.cols):
+
+                if (c, r) in color_map:
+                    one_line += f"{(c,r)}, "
+                    print(color_map[(c, r)], end="")
+                else:
+                    print("_", end="")
+            print()
         print(one_line)
-"""
+
 # ----- Solve -----
 
 
 solver = cp_model.CpSolver()
 solver.parameters.enumerate_all_solutions = True
-# solver.parameters.log_search_progress = True
-#solution_printer = SolutionPrinter(cells)
+solver.parameters.log_search_progress = False
+solution_printer = SolutionPrinter(var_df, rows, cols)
 
-status = solver.Solve(model)
+status = solver.Solve(model, solution_printer)
+
+
+
