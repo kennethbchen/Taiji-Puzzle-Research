@@ -17,7 +17,7 @@ from puzzles import puzzles
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "8queens"
+selected_puzzle = "test2"
 boards = puzzles[selected_puzzle]["boards"]
 
 layer_colors = ["red", "green", "blue", "cyan", "magenta"]
@@ -30,7 +30,7 @@ dimensions = {
 
 node_data = {}
 edge_data = []
-symbol_data = [(6, 0), (4, 1), (2, 2), (0, 3), (5, 4), (7, 5), (1, 6), (3, 7)]
+symbol_data = []
 
 
 # ----- Setup Boards -----
@@ -51,13 +51,15 @@ for i, (key, tile) in enumerate(node_data.items()):
         (tile.col + 1,  tile.layer, tile.row),
         (tile.col, tile.layer, tile.row - 1),
         (tile.col, tile.layer, tile.row + 1),
+    ]
 
-        # Diagonals
+    # This should be some setting to allow / disallow diagonalsq
+    if False:
+        neighbors.append([
         (tile.col - 1, tile.layer, tile.row - 1),
         (tile.col + 1, tile.layer, tile.row + 1),
         (tile.col - 1, tile.layer, tile.row + 1),
-        (tile.col + 1, tile.layer, tile.row - 1)
-    ]
+        (tile.col + 1, tile.layer, tile.row - 1)])
 
     # Create edges between neighbors
     for neighbor in neighbors:

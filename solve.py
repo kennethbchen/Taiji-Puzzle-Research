@@ -1,9 +1,10 @@
 from ortools.sat.python import cp_model
 from puzzles import puzzles
 import time
+import pandas
 
 
-selected_puzzle = "8queens"
+selected_puzzle = "sudoku"
 symbols = puzzles[selected_puzzle]["symbols"]
 region_capacity = puzzles[selected_puzzle]["region_capacity"]
 boards = puzzles[selected_puzzle]["boards"]
@@ -11,63 +12,101 @@ boards = puzzles[selected_puzzle]["boards"]
 rows, cols = len(boards[0]), len(boards[0][0])
 
 
-# ----- Configure Model -----
-
 model = cp_model.CpModel()
 
-# Create grid of cells based on board dimensions
-cells = []
-for i in range(rows):
-    row_idx = []
-    for j in range(cols):
-        row_idx.append(model.NewBoolVar(f'cell_{i}_{j}'))
-    cells.append(row_idx)
-
-
 # ----- Read Region Data -----
+var_df = pandas.DataFrame(columns=["color", "row", "col", "var"])
 regions = {}
 
-# Divide the boards into separate regions based on region id and board
-for board_idx in range(len(boards)):
-    for row_idx in range(len(boards[board_idx])):
-        for col_idx in range(len(boards[board_idx][row_idx])):
+# Create Variables
+# Each variable in the model is distinguished by its unique combination of color, row, and col
+for color_idx in range(len(symbols)):
+        for row_idx in range(len(boards[0])):
+            for col_idx in range(len(boards[0][row_idx])):
 
-            key = f'b{board_idx}_r{boards[board_idx][row_idx][col_idx]}'
-            value = cells[row_idx][col_idx]
+                row = {}
 
-            if key not in regions:
-                regions[key] = []
+                var_name = (color_idx, col_idx, row_idx)
 
-            regions[key].append(cells[row_idx][col_idx])
+                row["color"] = color_idx
+                row["col"] = col_idx
+                row["row"] = row_idx
+                row["var"] = model.NewBoolVar(str(var_name))
 
-print("Regions:", regions)
+                var_df.loc[len(var_df)] = row
+
+# Read Regions
+
+# Each region is distinguished by its unique combination of color, board, and region_id
+# cells with the same combination are in the same region
+# For each region in the board, there are as many of that region as there are types of colors
+for color_idx in range(len(symbols)):
+    for board_idx in range(len(boards)):
+        for row_idx in range(len(boards[board_idx])):
+            for col_idx in range(len(boards[board_idx][row_idx])):
+
+                region_id = boards[board_idx][row_idx][col_idx]
+
+                region_key = (color_idx, board_idx, region_id)
+
+                if not region_key in regions:
+                    regions[region_key] = []
+
+                variables = var_df.loc[(var_df["color"] == color_idx) & (var_df["row"] == row_idx) & (var_df["col"] == col_idx), "var"]
+
+                regions[region_key].append(variables.values[0])
+
+
+print("Variables:\n", var_df)
+print()
+print("Regions (color, board, region_id):", regions)
+
 
 # ----- Configure Model Constraints -----
 
-for i, (region_id, region_cells) in enumerate(regions.items()):
 
-    for cell in region_cells:
-        model.Add(cell == 0).OnlyEnforceIf(len(region_cells) < region_capacity)
+# Each region has either [region_capacity] or 0 symbols in it
+for region_idx, region in enumerate(regions.values()):
 
     left_or_var = model.NewBoolVar('')
     right_or_var = model.NewBoolVar('')
     model.AddBoolXOr([left_or_var, right_or_var])
-    model.Add(sum(region_cells) == region_capacity).OnlyEnforceIf(left_or_var)
-    model.Add(sum(region_cells) == 0).OnlyEnforceIf(right_or_var)
+    model.Add(sum(region) == region_capacity).OnlyEnforceIf(left_or_var)
+    model.Add(sum(region) == 0).OnlyEnforceIf(right_or_var)
 
-model.Add(sum([c for row in cells for c in row]) == symbols)
+# Each grid cell (col+row pair) may only have at most one symbol (of any color) in it
+for name, group in var_df.groupby(["col", "row"]):
+
+    group_vars = group["var"].tolist()
+
+    model.Add(sum(group_vars) <= 1)
+
+# Each colored symbol must appear as many times as defined in symbols
+for name, group in var_df.groupby("color"):
+
+    color_id = group["color"].iloc[0]
+
+    group_vars = group["var"].tolist()
+
+    model.Add(sum(group_vars) == symbols[color_id])
+
+
 
 
 # ----- Configure Solver -----
+
 
 class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
     # https://developers.google.com/optimization/scheduling/employee_scheduling#python_10
 
-    def __init__(self, cells):
+    def __init__(self, variables: pandas.DataFrame, rows, cols):
         cp_model.CpSolverSolutionCallback.__init__(self)
 
-        self.cells = cells
+        self.variables = variables
+        self.rows = rows
+        self.cols = cols
+
         self.__solution_count = 0
         self.__start_time = time.time()
 
@@ -80,23 +119,26 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
         )
         self.__solution_count += 1
 
-        for i in range(rows):
-            for j in range(cols):
-                if self.Value(cells[i][j]):
-                    print('O', end='')
-                else:
-                    print('_', end='')
-            print()
+        # Get only variables that have a symbol
+        df = self.variables
+        placements = df[df.apply(lambda val: self.Value(val["var"]) == 1, axis=1)]
 
-        print("\nCoordinates (col, row): ")
+        color_map = {}
+
+        for item in placements[["color", "row", "col"]].values:
+
+            color_map[(item[2], item[1])] = item[0] + 1
 
         one_line = ""
-        for i in range(rows):
-            for j in range(cols):
-                if self.Value(cells[i][j]):
-                    one_line += f"({j}, {i}), "
-                    print(f'({j}, {i}),')
-        print("\n")
+        for r in range(self.rows):
+            for c in range(self.cols):
+
+                if (c, r) in color_map:
+                    one_line += f"{(c,r)}, "
+                    print(color_map[(c, r)], end="")
+                else:
+                    print("_", end="")
+            print()
         print(one_line)
 
 # ----- Solve -----
@@ -104,7 +146,7 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
 solver = cp_model.CpSolver()
 solver.parameters.enumerate_all_solutions = True
-# solver.parameters.log_search_progress = True
-solution_printer = SolutionPrinter(cells)
+solver.parameters.log_search_progress = False
+solution_printer = SolutionPrinter(var_df, rows, cols)
 
 status = solver.Solve(model, solution_printer)
