@@ -17,7 +17,7 @@ from puzzles import puzzles
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "test2"
+selected_puzzle = "test1"
 boards = puzzles[selected_puzzle]["boards"]
 
 layer_colors = ["red", "green", "blue", "cyan", "magenta"]
@@ -30,7 +30,7 @@ dimensions = {
 
 node_data = {}
 edge_data = []
-symbol_data = []
+symbol_data = [(0, 0), (1, 0), (1, 1), (2, 1)]
 
 
 # ----- Setup Boards -----
@@ -53,7 +53,7 @@ for i, (key, tile) in enumerate(node_data.items()):
         (tile.col, tile.layer, tile.row + 1),
     ]
 
-    # This should be some setting to allow / disallow diagonalsq
+    # This should be some setting to allow / disallow diagonals
     if False:
         neighbors.append([
         (tile.col - 1, tile.layer, tile.row - 1),
@@ -78,20 +78,18 @@ plot = Plotter(axes=1, bg="gray")
 def on_mouse_click(event):
     mesh = event.actor
 
-    if not mesh:
+    if not mesh or not mesh.pickable:
         return
 
     if not add_symbol(mesh.pos()[0], mesh.pos()[2]):
-        print("removed")
         remove_symbol(mesh.pos()[0], mesh.pos()[2])
 
-    print(symbols)
     plot.render()
 
 def on_mouse_move(event):
     mesh = event.actor
 
-    if not mesh:
+    if not mesh or not mesh.pickable:
         plot.remove('silu')
         plot.render()
         return
@@ -133,6 +131,7 @@ n_centers = []
 n_colors = []
 
 for node in node_data.values():
+
     n_centers.append(node.coordinates())
     n_colors.append(layer_colors[node.layer])
 
@@ -143,6 +142,7 @@ for edge in edge_data:
     e_colors.append('white')
 
 edges = Lines(start_pts=e_endpoints, res=0, lw=5, c="black", alpha=1)
+edges.pickable = False
 
 nodes = []
 

@@ -4,7 +4,7 @@ import time
 import pandas
 
 
-selected_puzzle = "sudoku"
+selected_puzzle = "test1"
 symbols = puzzles[selected_puzzle]["symbols"]
 region_capacity = puzzles[selected_puzzle]["region_capacity"]
 boards = puzzles[selected_puzzle]["boards"]
