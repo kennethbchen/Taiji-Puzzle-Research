@@ -4,7 +4,7 @@ import time
 import pandas
 
 
-selected_puzzle = "test1"
+selected_puzzle = "taiji"
 symbols = puzzles[selected_puzzle]["symbols"]
 region_capacity = puzzles[selected_puzzle]["region_capacity"]
 boards = puzzles[selected_puzzle]["boards"]

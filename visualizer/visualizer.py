@@ -3,6 +3,7 @@ from Node import Node
 from Edge import Edge
 from puzzles import puzzles
 from functools import partial
+import pandas
 
 """
     Coordinate System:
@@ -18,8 +19,10 @@ from functools import partial
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "test1"
+selected_puzzle = "taiji"
 boards = puzzles[selected_puzzle]["boards"]
+
+render_diagonals = puzzles[selected_puzzle]["diagonals"] if "diagonals" in puzzles[selected_puzzle] else False
 
 layer_colors = ["red", "green", "blue", "cyan", "magenta"]
 
@@ -31,7 +34,7 @@ dimensions = {
 
 node_data = {}
 edge_data = []
-symbol_data = [(0, 0), (1, 0), (1, 1), (2, 1)]
+symbol_data = [(3, 0), (4, 0), (2, 2), (3, 2), (0, 3), (2, 3), (2, 4), (1, 5)]
 
 
 # ----- Setup Boards -----
@@ -46,6 +49,7 @@ for layer_i, layer in enumerate(boards):
 # ----- Add neighbors -----
 for i, (key, tile) in enumerate(node_data.items()):
 
+
     neighbors = [
         # Cardinals
         (tile.col - 1, tile.layer, tile.row),
@@ -54,9 +58,8 @@ for i, (key, tile) in enumerate(node_data.items()):
         (tile.col, tile.layer, tile.row + 1),
     ]
 
-    # This should be some setting to allow / disallow diagonals
-    if False:
-        neighbors.append([
+    if render_diagonals:
+        neighbors.extend([
         (tile.col - 1, tile.layer, tile.row - 1),
         (tile.col + 1, tile.layer, tile.row + 1),
         (tile.col - 1, tile.layer, tile.row + 1),
@@ -67,17 +70,20 @@ for i, (key, tile) in enumerate(node_data.items()):
         if neighbor in node_data:
             tile.add_neighbor(node_data[neighbor])
 
+
             if tile.should_have_edge(node_data[neighbor]):
                 edge_data.append(Edge(tile, node_data[neighbor]))
-
 
 # ----- Visualize -----
 
 plot = Plotter(axes=1, bg="gray")
 
+
 def on_opacity_slider(layer_index, widget, event):
     for node in nodes[layer_index]:
         node.alpha(widget.value)
+
+    edges[layer_index].alpha(widget.value)
 
 
 def on_mouse_click(event):
@@ -90,6 +96,7 @@ def on_mouse_click(event):
         remove_symbol(mesh.pos()[0], mesh.pos()[2])
 
     plot.render()
+
 
 def on_mouse_move(event):
     mesh = event.actor
@@ -132,8 +139,8 @@ def add_symbol(row, col):
 for symbol_coord in symbol_data:
     add_symbol(symbol_coord[0], symbol_coord[1])
 
-n_centers = {}
-n_colors = {}
+n_centers = [[] for x in range(dimensions["boards"])]
+n_colors = [[] for x in range(dimensions["boards"])]
 
 for i in range(dimensions["boards"]):
     n_centers[i] = []
@@ -144,14 +151,23 @@ for node in node_data.values():
     n_centers[node.layer].append(node.coordinates())
     n_colors[node.layer].append(layer_colors[node.layer])
 
-e_endpoints = []
-e_colors = []
-for edge in edge_data:
-    e_endpoints.append(edge.endpoints())
-    e_colors.append('white')
+e_endpoints = [[] for x in range(dimensions["boards"])]
+e_colors = [[] for x in range(dimensions["boards"])]
 
-edges = Lines(start_pts=e_endpoints, res=0, lw=5, c="black", alpha=1)
-edges.pickable = False
+for edge in edge_data:
+    board_idx = edge.parent_a.layer
+    e_endpoints[board_idx].append(edge.endpoints())
+    e_colors[board_idx].append(layer_colors[board_idx])
+
+
+edges = [[] for x in range(dimensions["boards"])]
+
+
+for board_idx in range(dimensions["boards"]):
+
+    edges[board_idx] = Lines(start_pts=e_endpoints[board_idx], res=0, lw=5, c=layer_colors[board_idx], alpha=1)
+    edges[board_idx].pickable = False
+
 
 nodes = [[] for x in range(len(n_centers))]
 

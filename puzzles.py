@@ -35,6 +35,7 @@ puzzles = {
     "8queens": {
         "symbols": [8],
         "region_capacity": 1,
+        "diagonals": True,
         "boards": [
             [
                 [1, 1, 1, 1, 1, 1, 1, 1],
