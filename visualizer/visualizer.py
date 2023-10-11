@@ -2,6 +2,7 @@ from vedo import show, Spheres, Lines, Plotter, Sphere, Line
 from Node import Node
 from Edge import Edge
 from puzzles import puzzles
+from functools import partial
 
 """
     Coordinate System:
@@ -73,6 +74,10 @@ for i, (key, tile) in enumerate(node_data.items()):
 # ----- Visualize -----
 
 plot = Plotter(axes=1, bg="gray")
+
+def on_opacity_slider(layer_index, widget, event):
+    for node in nodes[layer_index]:
+        node.alpha(widget.value)
 
 
 def on_mouse_click(event):
@@ -158,6 +163,24 @@ for board_idx in range(len(n_centers)):
 
 plot.add_callback('mouse move', on_mouse_move)
 plot.add_callback("mouse click", on_mouse_click)
+
+slider_origin = (0.05, 0.1)
+slider_size = (0.1, 0.1)
+
+for board_idx in range(len(n_centers)):
+    plot.add_slider(
+        partial(on_opacity_slider, board_idx),
+        xmin=0.0,
+        xmax=1.0,
+        value=1.0,
+        pos=[[slider_origin[0], slider_origin[1] * (board_idx + 1)],[slider_origin[0] + slider_size[0], slider_origin[1] * (board_idx + 1)]],
+        title=f"Lyr {board_idx+1} Alpha",
+        show_value=False
+    )
+
+
+
+
 
 plot.show(edges, nodes, list(symbols.values()), at=0).interactive().close()
 exit()
