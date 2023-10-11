@@ -127,13 +127,17 @@ def add_symbol(row, col):
 for symbol_coord in symbol_data:
     add_symbol(symbol_coord[0], symbol_coord[1])
 
-n_centers = []
-n_colors = []
+n_centers = {}
+n_colors = {}
+
+for i in range(dimensions["boards"]):
+    n_centers[i] = []
+    n_colors[i] = []
 
 for node in node_data.values():
 
-    n_centers.append(node.coordinates())
-    n_colors.append(layer_colors[node.layer])
+    n_centers[node.layer].append(node.coordinates())
+    n_colors[node.layer].append(layer_colors[node.layer])
 
 e_endpoints = []
 e_colors = []
@@ -144,14 +148,13 @@ for edge in edge_data:
 edges = Lines(start_pts=e_endpoints, res=0, lw=5, c="black", alpha=1)
 edges.pickable = False
 
-nodes = []
+nodes = [[] for x in range(len(n_centers))]
 
-for i in range(len(n_centers)):
-    s = Sphere(r=0.1, alpha=1).pos(n_centers[i]).color(n_colors[i])
-    s.name = f"sphere nr.{i} at {n_centers[i]}"
-    nodes.append(s)
-
-
+for board_idx in range(len(n_centers)):
+    for i in range(len(n_centers[board_idx])):
+        s = Sphere(r=0.1, alpha=1).pos(n_centers[board_idx][i]).color(n_colors[board_idx][i])
+        s.name = f"sphere at {n_centers[board_idx][i]}"
+        nodes[board_idx].append(s)
 
 plot.add_callback('mouse move', on_mouse_move)
 plot.add_callback("mouse click", on_mouse_click)
