@@ -19,7 +19,7 @@ import pandas
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "taiji"
+selected_puzzle = "test1"
 boards = puzzles[selected_puzzle]["boards"]
 
 render_diagonals = puzzles[selected_puzzle]["diagonals"] if "diagonals" in puzzles[selected_puzzle] else False
@@ -34,7 +34,7 @@ dimensions = {
 
 node_data = {}
 edge_data = []
-symbol_data = [(3, 0), (4, 0), (2, 2), (3, 2), (0, 3), (2, 3), (2, 4), (1, 5)]
+symbol_data = []
 
 
 # ----- Setup Boards -----

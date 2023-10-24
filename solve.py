@@ -4,7 +4,7 @@ import time
 import pandas
 
 
-selected_puzzle = "taiji"
+selected_puzzle = "sudoku"
 symbols = puzzles[selected_puzzle]["symbols"]
 region_capacity = puzzles[selected_puzzle]["region_capacity"]
 boards = puzzles[selected_puzzle]["boards"]
@@ -21,19 +21,19 @@ regions = {}
 # Create Variables
 # Each variable in the model is distinguished by its unique combination of color, row, and col
 for color_idx in range(len(symbols)):
-        for row_idx in range(len(boards[0])):
-            for col_idx in range(len(boards[0][row_idx])):
+    for row_idx in range(len(boards[0])):
+        for col_idx in range(len(boards[0][row_idx])):
 
-                row = {}
+            row = {}
 
-                var_name = (color_idx, col_idx, row_idx)
+            var_name = (color_idx, col_idx, row_idx)
 
-                row["color"] = color_idx
-                row["col"] = col_idx
-                row["row"] = row_idx
-                row["var"] = model.NewBoolVar(str(var_name))
+            row["color"] = color_idx
+            row["col"] = col_idx
+            row["row"] = row_idx
+            row["var"] = model.NewBoolVar(str(var_name))
 
-                var_df.loc[len(var_df)] = row
+            var_df.loc[len(var_df)] = row
 
 # Read Regions
 
