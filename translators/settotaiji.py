@@ -1,23 +1,27 @@
-universe = [1, 2, 3, 4]
-sets = [[1, 3], [2, 4], [1], [2, 3, 4]]
+import pprint
+
+uni = [1, 2, 3, 4]
+sts = [[1, 3], [2, 4], [1], [2, 3, 4]]
 
 def print_board(board):
     for row in board:
             print(row)
 
-def set_to_taiji(universe, sets):
+def set_to_taiji(universe, subsets):
 
     rows = 3
-    cols = len(sets) * 3
+    cols = len(subsets) * 3
 
     boards = []
 
     """
         Create Helper Boards
-        These boards make it impossible for certain squares to be a part of the taiji solution
+        These boards make it impossible for certain squares to be a part of the taiji solution.
+        It does it by having at least one layer where it is a region of size one, making pairing impossible.
         
+        The goal is to keep each square with a letter in it (below) a valid solution, while blocking all others
         
-        Create Constraint For:
+        Create Constraint For Boards:
         
         C1A:
         A X _ B X _
@@ -107,7 +111,6 @@ def set_to_taiji(universe, sets):
                 else:
                     c3_row_data.append(1)
 
-
         c1a.append(c1a_row_data)
         c1b.append(c1b_row_data)
 
@@ -124,9 +127,19 @@ def set_to_taiji(universe, sets):
 
     boards.append(c3)
 
+    # Create constraints for the sets
+    for data in subsets:
+        set_board = [[0 for col in range(cols)] for row in range(rows)]
+
+        not_set = list(set(universe) - set(data))
+
+        # Separate everything that is not in data into its own region
+        for item in not_set:
+            col = (item - 1) * 3
+
+            set_board[0][col] = 1
+            set_board[1][col] = 1
+
+        boards.append(set_board)
+
     return boards
-
-
-for board in set_to_taiji(universe, sets):
-    print_board(board)
-    print()

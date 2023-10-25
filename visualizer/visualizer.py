@@ -19,12 +19,12 @@ import pandas
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "test1"
+selected_puzzle = "set_cover"
 boards = puzzles[selected_puzzle]["boards"]
 
 render_diagonals = puzzles[selected_puzzle]["diagonals"] if "diagonals" in puzzles[selected_puzzle] else False
 
-layer_colors = ["red", "green", "blue", "cyan", "magenta"]
+layer_colors = ["red", "green", "blue", "cyan", "magenta", "yellow", "orange", "purple", "white"]
 
 dimensions = {
     "rows": len(boards[0]),
