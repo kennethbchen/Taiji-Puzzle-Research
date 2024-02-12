@@ -3,6 +3,7 @@ from puzzles import puzzles
 import time
 import pandas
 
+from SGP import SGP
 
 selected_puzzle = "taiji"
 symbols = puzzles[selected_puzzle]["symbols"]
@@ -11,6 +12,10 @@ boards = puzzles[selected_puzzle]["boards"]
 
 rows, cols = len(boards[0]), len(boards[0][0])
 
+puzzle = SGP.from_dict(puzzles[selected_puzzle])
+
+print(puzzle)
+exit()
 
 model = cp_model.CpModel()
 
