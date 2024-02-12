@@ -14,6 +14,13 @@ class SGP():
         output = "Symbols: {sym}\nRegion Capacity: {rc}\nDiagonals Allowed: {da}\nBoards:\n{bds}\n"
         return output.format(sym=self.symbols, rc=self.region_capacity, da=self.diagonals_allowed, bds=self.boards)
 
+    def num_colors(self):
+        return len(self.symbols)
+
+    # row, col
+    def board_shape(self):
+        return len(self.boards[0]), len(self.boards[0][0])
+
     @staticmethod
     def from_dict(data_dict):
         symbols = data_dict["symbols"]

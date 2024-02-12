@@ -5,17 +5,14 @@ import pandas
 
 from SGP import SGP
 
-selected_puzzle = "taiji"
-symbols = puzzles[selected_puzzle]["symbols"]
-region_capacity = puzzles[selected_puzzle]["region_capacity"]
-boards = puzzles[selected_puzzle]["boards"]
-
-rows, cols = len(boards[0]), len(boards[0][0])
+selected_puzzle = "test2"
 
 puzzle = SGP.from_dict(puzzles[selected_puzzle])
 
-print(puzzle)
-exit()
+symbols = puzzle.symbols
+region_capacity = puzzle.region_capacity
+boards = puzzle.boards
+rows, cols = puzzle.board_shape()
 
 model = cp_model.CpModel()
 
