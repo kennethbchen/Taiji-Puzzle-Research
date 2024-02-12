@@ -1,3 +1,4 @@
+import pandas as pd
 from ortools.sat.python import cp_model
 from puzzles import puzzles
 import time
@@ -5,11 +6,12 @@ import pandas
 
 from SGP import SGP
 
-selected_puzzle = "taiji"
+selected_puzzle = "test2"
 
 puzzle = SGP.from_dict(puzzles[selected_puzzle])
 
-def solve(puzzle):
+
+def solve(puzzle, get_all = False):
     symbols = puzzle.symbols
     region_capacity = puzzle.region_capacity
     boards = puzzle.boards
@@ -165,19 +167,24 @@ def solve(puzzle):
 
     # ----- Solve -----
 
-
     solver = cp_model.CpSolver()
-    solver.parameters.enumerate_all_solutions = True
+    solver.parameters.enumerate_all_solutions = get_all
     solver.parameters.log_search_progress = False
     solution_callback = SolutionCollector(var_df, rows, cols)
 
     status = solver.Solve(model, solution_callback)
 
     if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-        return solution_callback.solutions
+
+        if solver.parameters.enumerate_all_solutions:
+            return solution_callback.solutions
+        else:
+            # Get only variables that were used in the solution
+            return var_df[var_df["var"].apply(lambda var: solver.Value(var) == 1)]
+
     else:
         return []
 
-sols = solve(puzzle)
+sols = solve(puzzle, get_all=True)
 
 print(sols)
