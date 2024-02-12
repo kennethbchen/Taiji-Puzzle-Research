@@ -19,7 +19,7 @@ import pandas
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "set_cover"
+selected_puzzle = "8queens"
 boards = puzzles[selected_puzzle]["boards"]
 
 render_diagonals = puzzles[selected_puzzle]["diagonals"] if "diagonals" in puzzles[selected_puzzle] else False
@@ -34,7 +34,7 @@ dimensions = {
 
 node_data = {}
 edge_data = []
-symbol_data = []
+symbol_data = [(0, 0), (1, 0), (3, 0), (2, 1), (0, 3), (2, 3)]
 
 
 # ----- Setup Boards -----
@@ -77,6 +77,7 @@ for i, (key, tile) in enumerate(node_data.items()):
 # ----- Visualize -----
 
 plot = Plotter(axes=1, bg="gray")
+camera = plot.camera
 
 
 def on_opacity_slider(layer_index, widget, event):
@@ -173,7 +174,7 @@ nodes = [[] for x in range(len(n_centers))]
 
 for board_idx in range(len(n_centers)):
     for i in range(len(n_centers[board_idx])):
-        s = Sphere(r=0.1, alpha=1).pos(n_centers[board_idx][i]).color(n_colors[board_idx][i])
+        s = Sphere(r=0.25, alpha=1).pos(n_centers[board_idx][i]).color(n_colors[board_idx][i])
         s.name = f"sphere at {n_centers[board_idx][i]}"
         nodes[board_idx].append(s)
 
@@ -196,7 +197,7 @@ for board_idx in range(len(n_centers)):
 
 
 
-
+camera.Pitch(-80)
 
 plot.show(edges, nodes, list(symbols.values()), at=0).interactive().close()
 exit()

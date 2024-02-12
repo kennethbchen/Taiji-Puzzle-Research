@@ -4,7 +4,7 @@ import time
 import pandas
 
 
-selected_puzzle = "sudoku"
+selected_puzzle = "taiji"
 symbols = puzzles[selected_puzzle]["symbols"]
 region_capacity = puzzles[selected_puzzle]["region_capacity"]
 boards = puzzles[selected_puzzle]["boards"]
@@ -131,10 +131,12 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
         one_line = ""
         for r in range(self.rows):
+
             for c in range(self.cols):
 
                 if (c, r) in color_map:
                     one_line += f"{(c,r)}, "
+
                     print(color_map[(c, r)], end="")
                 else:
                     print("_", end="")
@@ -143,10 +145,10 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
 # ----- Solve -----
 
-
+print("Start Solve")
 solver = cp_model.CpSolver()
 solver.parameters.enumerate_all_solutions = True
-solver.parameters.log_search_progress = False
+solver.parameters.log_search_progress = True
 solution_printer = SolutionPrinter(var_df, rows, cols)
 
 status = solver.Solve(model, solution_printer)
