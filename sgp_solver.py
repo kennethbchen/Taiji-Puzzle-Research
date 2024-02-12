@@ -97,6 +97,36 @@ for name, group in var_df.groupby("color"):
 
 # ----- Configure Solver -----
 
+class SolutionCollector(cp_model.CpSolverSolutionCallback):
+
+    # https://stackoverflow.com/questions/58934609/obtain-list-of-sat-solutions-from-ortools
+
+    def __init__(self, variables: pandas.DataFrame, rows, cols):
+        cp_model.CpSolverSolutionCallback.__init__(self)
+
+        self.variables = variables
+        self.rows = rows
+        self.cols = cols
+
+        self.__solution_count = 0
+        self.__start_time = time.time()
+
+        self.solutions = []
+
+    def on_solution_callback(self):
+        current_time = time.time()
+        print(
+            f"\n---------- Solution {self.__solution_count} ----------\n"
+            f"time = {current_time - self.__start_time}s"
+        )
+        self.__solution_count += 1
+
+        # Get only variables that have a symbol
+        df = self.variables
+        placements = df[df.apply(lambda val: self.Value(val["var"]) == 1, axis=1)]
+
+        self.solutions.append(placements)
+
 
 class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
@@ -111,6 +141,7 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 
         self.__solution_count = 0
         self.__start_time = time.time()
+
 
     def on_solution_callback(self):
 
@@ -150,7 +181,11 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
 print("Start Solve")
 solver = cp_model.CpSolver()
 solver.parameters.enumerate_all_solutions = True
-solver.parameters.log_search_progress = True
-solution_printer = SolutionPrinter(var_df, rows, cols)
+solver.parameters.log_search_progress = False
+solution_callback = SolutionCollector(var_df, rows, cols)
 
-status = solver.Solve(model, solution_printer)
+status = solver.Solve(model, solution_callback)
+
+if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+    print(solution_callback.solutions)
+    print("{num} Solutions Found".format(num=len(solution_callback.solutions)))
