@@ -1,17 +1,8 @@
-import pandas as pd
 from ortools.sat.python import cp_model
-from puzzles import puzzles
 import time
 import pandas
 
-from SGP import SGP
-
-selected_puzzle = "test2"
-
-puzzle = SGP.from_dict(puzzles[selected_puzzle])
-
-
-def solve(puzzle, get_all = False):
+def Solve_SGP(puzzle, get_all = False):
     symbols = puzzle.symbols
     region_capacity = puzzle.region_capacity
     boards = puzzle.boards
@@ -180,11 +171,7 @@ def solve(puzzle, get_all = False):
             return solution_callback.solutions
         else:
             # Get only variables that were used in the solution
-            return var_df[var_df["var"].apply(lambda var: solver.Value(var) == 1)]
+            return [var_df[var_df["var"].apply(lambda var: solver.Value(var) == 1)][["row", "col", "color"]]]
 
     else:
         return []
-
-sols = solve(puzzle, get_all=True)
-
-print(sols)
