@@ -17,6 +17,9 @@ class SGP():
     def num_colors(self):
         return len(self.symbols)
 
+    def num_boards(self):
+        return len(self.boards)
+
     # row, col
     def board_shape(self):
         return len(self.boards[0]), len(self.boards[0][0])

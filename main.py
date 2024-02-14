@@ -3,9 +3,9 @@ from SGP import SGP
 
 from sgp_solver import Solve_SGP
 
-puzzle = SGP.from_dict(puzzles["8queens"])
+puzzle = SGP.from_dict(puzzles["taiji"])
 
-solutions = Solve_SGP(puzzle, get_all=True)
+solutions = Solve_SGP(puzzle)
 
 print(solutions)
 print("{n} Solutions Found".format(n=len(solutions)))

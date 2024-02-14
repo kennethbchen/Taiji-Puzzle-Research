@@ -5,6 +5,8 @@ from puzzles import puzzles
 from functools import partial
 import pandas
 
+from SGP import SGP
+
 """
     Coordinate System:
     +x - right
@@ -19,17 +21,18 @@ import pandas
     (x, y, z) -> (column, board, row)
 """
 
-selected_puzzle = "8queens"
-boards = puzzles[selected_puzzle]["boards"]
-
-render_diagonals = puzzles[selected_puzzle]["diagonals"] if "diagonals" in puzzles[selected_puzzle] else False
-
 layer_colors = ["red", "green", "blue", "cyan", "magenta", "yellow", "orange", "purple", "white"]
 
+puzzle = SGP.from_dict(puzzles["taiji"])
+
+boards = puzzle.boards
+render_diagonals = puzzle.diagonals_allowed
+
+
 dimensions = {
-    "rows": len(boards[0]),
-    "cols": len(boards[0][0]),
-    "boards": len(boards)
+    "rows": puzzle.board_shape()[0],
+    "cols": puzzle.board_shape()[1],
+    "boards": puzzle.num_boards()
 }
 
 node_data = {}
