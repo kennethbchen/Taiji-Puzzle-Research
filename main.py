@@ -6,7 +6,7 @@ from sgp_solver import Solve_SGP
 from visualizer.visualizer import visualize_SGP
 
 # Solve and visualize puzzle
-puzzle = SGP.from_dict(puzzles["8queens"])
+puzzle = SGP.from_dict(puzzles["taiji"])
 
 solutions = Solve_SGP(puzzle)
 
