@@ -10,24 +10,14 @@ def sudoku_to_SGP(sudoku_puzzle):
 
     sgp_size = sudoku_puzzle.size * 2
     # Array of 4 boards where each number in a board is a distinct region
-    sgp_boards = np.ndarray((4, sgp_size, sgp_size), dtype=int)
-
-
-    # Rows
-    sgp_boards[0] = np.transpose(np.full( (sgp_size, sgp_size), np.arange(0, sgp_size)))
+    sgp_boards = np.zeros((4, sgp_size, sgp_size))
 
     # Columns
-    sgp_boards[1] = (np.transpose(sgp_boards[0]))
+    sgp_boards[1] = np.full( (sgp_size, sgp_size), np.arange(0, sgp_size))
 
-    # Diagonals
+    # Rows
+    sgp_boards[0] = np.transpose(sgp_boards[1])
 
-    dia = numpy.full((sgp_size, sgp_size), numpy.arange(sgp_size, sgp_size * 2))
-
-    for i in range(sgp_size):
-        dia[i] -= i
-
-    sgp_boards[2] = dia
-    sgp_boards[3] = (np.flip(dia, 0))
 
     # n x m blocks
 
