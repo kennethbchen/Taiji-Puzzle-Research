@@ -4,7 +4,7 @@ from sudoku import Sudoku
 from SGP import SGP
 import numpy as np
 
-puzzle = Sudoku(3, 2).difficulty(0.5)
+puzzle = Sudoku(3).difficulty(0.5)
 
 def sudoku_to_SGP(sudoku_puzzle):
     print(sudoku_puzzle)
@@ -48,11 +48,14 @@ def sudoku_to_SGP(sudoku_puzzle):
     # Horizontal Checkerboard
     sgp_boards[3] = np.transpose(checker_col)
 
-    print(sgp_boards)
-    #print(sgp_boards.tolist())
+    # Symbols
+    sgp_symbols = np.full((sudoku_puzzle.width * sudoku_puzzle.height), sudoku_puzzle.width * sudoku_puzzle.height).tolist()
+
+    return SGP(sgp_symbols, sgp_boards.tolist())
+
 
     sgp_hint = np.tile(np.array(sudoku_puzzle.board), (2,2))
 
 
 
-sudoku_to_SGP(puzzle)
+print(sudoku_to_SGP(puzzle))
