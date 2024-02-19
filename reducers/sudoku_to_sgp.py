@@ -51,10 +51,12 @@ def sudoku_to_SGP(sudoku_puzzle):
     # Symbols
     sgp_symbols = np.full((sudoku_puzzle.width * sudoku_puzzle.height), sudoku_puzzle.width * sudoku_puzzle.height).tolist()
 
-    return SGP(sgp_symbols, sgp_boards.tolist())
-
-
     sgp_hint = np.tile(np.array(sudoku_puzzle.board), (2,2))
+
+    return SGP(sgp_symbols, sgp_boards.tolist(), solution_hints=sgp_hint)
+
+
+
 
 
 

@@ -1,10 +1,12 @@
 
 class SGP():
-    def __init__(self, symbols, boards, region_capacity=2, diagonals_allowed=False):
+    def __init__(self, symbols, boards, solution_hints=[], region_capacity=2, diagonals_allowed=False):
 
         self.symbols = symbols
 
         self.boards = boards
+
+        self.solution_hints = solution_hints
 
         self.region_capacity = region_capacity
 
