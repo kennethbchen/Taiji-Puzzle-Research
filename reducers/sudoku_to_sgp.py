@@ -4,8 +4,6 @@ from sudoku import Sudoku
 from SGP import SGP
 import numpy as np
 
-puzzle = Sudoku(3).difficulty(0.5)
-
 def sudoku_to_SGP(sudoku_puzzle):
     print(sudoku_puzzle)
     sgp_size = sudoku_puzzle.size * 2
@@ -54,10 +52,3 @@ def sudoku_to_SGP(sudoku_puzzle):
     sgp_hint = np.tile(np.array(sudoku_puzzle.board), (2,2))
 
     return SGP(sgp_symbols, sgp_boards.tolist(), solution_hints=sgp_hint)
-
-
-
-
-
-
-print(sudoku_to_SGP(puzzle))
