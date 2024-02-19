@@ -47,7 +47,7 @@ def sudoku_to_SGP(sudoku_puzzle):
     sgp_boards[3] = np.transpose(checker_col)
 
     # Symbols
-    sgp_symbols = np.full((sudoku_puzzle.width * sudoku_puzzle.height), sudoku_puzzle.width * sudoku_puzzle.height).tolist()
+    sgp_symbols = np.full((sudoku_puzzle.width * sudoku_puzzle.height), sudoku_puzzle.width * sudoku_puzzle.height * 4).tolist()
 
     sgp_hint = np.tile(np.array(sudoku_puzzle.board), (2,2))
 

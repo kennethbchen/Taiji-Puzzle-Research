@@ -2,7 +2,7 @@ from ortools.sat.python import cp_model
 import time
 import pandas
 
-def Solve_SGP(puzzle, get_all = False):
+def Solve_SGP(puzzle, get_all=False, log_progress=False):
     symbols = puzzle.symbols
     region_capacity = puzzle.region_capacity
     boards = puzzle.boards
@@ -160,7 +160,7 @@ def Solve_SGP(puzzle, get_all = False):
 
     solver = cp_model.CpSolver()
     solver.parameters.enumerate_all_solutions = get_all
-    solver.parameters.log_search_progress = False
+    solver.parameters.log_search_progress = log_progress
     solution_callback = SolutionCollector(var_df, rows, cols)
 
     status = solver.Solve(model, solution_callback)
