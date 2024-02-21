@@ -8,7 +8,7 @@ from sgp_solver import Solve_SGP
 
 from visualizer.visualizer import visualize_SGP
 
-sudoku_puzzle = Sudoku(2, 2).difficulty(0.5)
+sudoku_puzzle = Sudoku(3, 3).difficulty(0.5)
 sudoku_puzzle.show()
 print("Solved Sudoku:")
 sudoku_solution = sudoku_puzzle.solve()
@@ -19,11 +19,12 @@ puzzle = sudoku_to_SGP(sudoku_puzzle)
 
 #visualize_SGP(puzzle)
 
-solutions = Solve_SGP(puzzle, get_all=False, log_progress=False)
-solution = solutions[0]
+solutions = Solve_SGP(puzzle, get_all=True, log_progress=False)
 
-print("Solved SGP:")
-for row in range(puzzle.board_shape()[0]):
-    for col in range(puzzle.board_shape()[1]):
-        print(solution.query("row=={r} and col=={c}".format(r=row, c=col))["color"].values[0] + 1, end=" ")
-    print()
+for solution_df in solutions:
+    # Sort the df so the solution is read in reading order
+    # Get only the color number
+    # Convert from 0 indexing to 1 indexing
+    solution = solution_df.sort_values(by=["row", "col"]).values.reshape((solution_df["row"].max() + 1, -1, 3))[:, :, 2] + 1
+    print("Solved SGP:")
+    print(solution)
