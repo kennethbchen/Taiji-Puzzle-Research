@@ -81,6 +81,15 @@ def Solve_SGP(puzzle, get_all=False, log_progress=False):
 
         model.Add(sum(group_vars) == symbols[color_id])
 
+    # Solution Hints set constraints on what colors should be in a cell
+    for row in range(len(puzzle.solution_hints)):
+        for col in range(len(puzzle.solution_hints[0])):
+
+            if puzzle.solution_hints[row][col] != None:
+                hint_color = puzzle.solution_hints[row][col] - 1
+                hint_var = var_df.query("row=={r} and col=={c} and color=={color}".format(r=row, c=col, color=hint_color))["var"]
+
+                model.Add(hint_var.values[0] == True)
 
 
 

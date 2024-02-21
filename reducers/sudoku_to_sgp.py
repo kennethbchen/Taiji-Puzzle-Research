@@ -5,7 +5,6 @@ from SGP import SGP
 import numpy as np
 
 def sudoku_to_SGP(sudoku_puzzle):
-    print(sudoku_puzzle)
     sgp_size = sudoku_puzzle.size * 2
     # Array of 4 boards where each number in a board is a distinct region
     sgp_boards = np.zeros((4, sgp_size, sgp_size))
