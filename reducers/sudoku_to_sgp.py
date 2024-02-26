@@ -74,17 +74,20 @@ def is_solution_tiled(solution):
 
     origin_tile = None
     for tile in tile_positions:
-        tile_offset = (tile[0] * tile_size[0], tile[1] * tile_size[1])
 
-        current_tile_data = solution[tile_offset[0]: (tile_offset[0] + tile_size[0]), tile_offset[1]: (tile_offset[1] + tile_size[1])]
+        current_tile_data = get_solution_tile(solution, tile)
+
         if origin_tile is None:
             origin_tile = current_tile_data
 
-        if not (current_tile_data & origin_tile).all():
+        if not (current_tile_data == origin_tile).all():
+
+            """
             print("Origin tile and", tile, "are not the same")
             print(origin_tile)
             print("vs")
             print(current_tile_data)
+            """
             return False
 
     return True
