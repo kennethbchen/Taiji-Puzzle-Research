@@ -7,27 +7,8 @@ from reducers.sudoku_to_sgp import sudoku_to_SGP, is_solution_tiled,get_solution
 from sgp_solver import Solve_SGP
 from visualizer.visualizer import visualize_SGP
 
-"""
-temp = numpy.asarray(
-[
-    [2, 4, 3, 1, 2, 4, 3, 1],
-    [3, 1, 2, 4, 3, 1, 2, 4],
-    [4, 2, 1, 3, 4, 3, 1, 2],
-    [1, 3, 4, 2, 1, 2, 4, 3],
-    [2, 4, 3, 1, 2, 4, 3, 1],
-    [3, 1, 2, 4, 3, 1, 2, 4],
-    [4, 2, 1, 3, 4, 2, 1, 3],
-    [1, 3, 4, 2, 1, 3, 4, 2]
-]
-)
-print(temp)
-print(is_solution_tiled(temp))
-
-exit()
-
-"""
-width = 2
-height = 2
+width = 3
+height = 3
 sudoku_puzzle = Sudoku(width, height).difficulty(0.5)
 sudoku_puzzle.show()
 
@@ -44,8 +25,9 @@ puzzle = sudoku_to_SGP(sudoku_puzzle)
 solutions = Solve_SGP(puzzle, get_all=True, log_progress=False)
 
 # Problems:
-# Not every solution is tiled
+# Not every "solution" is tiled
 # Not every "solution" is valid sudoku
+# Sometimes no solutions are found when there should be at least 1 (width=3, height=2)
 
 correct = 0
 
@@ -64,8 +46,9 @@ for solution_df in solutions:
     if tiled and valid:
         correct += 1
         print(solution)
-        print("Tiled and Valid Solution:")
+        print("Correct Solution:")
         print(sudoku_part)
         print("==================")
 
+print("Total Solutions Found:", len(solutions))
 print("Correct Solutions Found:", correct)
