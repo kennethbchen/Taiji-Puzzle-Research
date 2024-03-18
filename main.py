@@ -3,13 +3,13 @@ from sudoku import Sudoku
 
 from puzzles import puzzles
 from SGP import SGP
-from reducers.sudoku_to_sgp import sudoku_to_SGP, is_solution_tiled,get_solution_tile
+from reducers.sudoku_to_sgp import sudoku_to_SGP, is_solution_tiled, get_solution_tile
 from sgp_solver import Solve_SGP
 from visualizer.visualizer import visualize_SGP
 
 width = 3
 height = 3
-sudoku_puzzle = Sudoku(width, height).difficulty(0.5)
+sudoku_puzzle = Sudoku(width, height, seed=7).difficulty(0.5)
 sudoku_puzzle.show()
 
 print("Solved Sudoku:")
@@ -20,6 +20,8 @@ print("-------------")
 
 puzzle = sudoku_to_SGP(sudoku_puzzle)
 
+print(numpy.array(puzzle.boards))
+
 #visualize_SGP(puzzle)
 
 solutions = Solve_SGP(puzzle, get_all=True, log_progress=False)
@@ -28,7 +30,8 @@ solutions = Solve_SGP(puzzle, get_all=True, log_progress=False)
 # Not every "solution" is tiled
 # Not every "solution" is valid sudoku
 # Sometimes no solutions are found when there should be at least 1 (width=3, height=2)
-
+not_valid_sudoku = 0
+not_tiled = 0
 correct = 0
 
 for solution_df in solutions:
@@ -43,12 +46,26 @@ for solution_df in solutions:
     tiled = is_solution_tiled(solution)
     valid = temp_sudoku.validate()
 
+    if not valid:
+        not_valid_sudoku += 1
+
+    if not tiled:
+        not_tiled += 1
+
     if tiled and valid:
         correct += 1
-        print(solution)
         print("Correct Solution:")
+        print(solution)
+        print()
         print(sudoku_part)
         print("==================")
+    else:
+        print("Incorrect Solution:")
+        print(solution)
+        print("==================")
+
 
 print("Total Solutions Found:", len(solutions))
+print("'Solutions' that are not valid sudoku:", not_valid_sudoku)
+print("'Solutions' that are not tiled:", not_tiled)
 print("Correct Solutions Found:", correct)
