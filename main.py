@@ -7,8 +7,8 @@ from reducers.sudoku_to_sgp import sudoku_to_SGP, is_solution_tiled, get_solutio
 from sgp_solver import Solve_SGP
 from visualizer.visualizer import visualize_SGP
 
-width = 3
-height = 3
+width = 2
+height = 2
 sudoku_puzzle = Sudoku(width, height, seed=7).difficulty(0.5)
 sudoku_puzzle.show()
 
