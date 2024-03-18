@@ -4,10 +4,15 @@ from sudoku import Sudoku
 from SGP import SGP
 import numpy as np
 
-def latin_to_SGP(sudoku_puzzle):
-    sgp_size = sudoku_puzzle.size * 2
-    # Array of 4 boards where each number in a board is a distinct region
-    sgp_boards = np.zeros((4, sgp_size, sgp_size))
+# latin_square should be some nxn numpy array filled with numbers [1, n-1]
+# latin_square can be partially filled if certain values are None
+def latin_to_SGP(latin_square_array):
+    latin_square_size = latin_square_array.shape[0]
+
+    sgp_size = latin_square_array.shape[0] * 2
+
+    # Array of 2 boards where each number in a board is a distinct region
+    sgp_boards = np.zeros((2, sgp_size, sgp_size), dtype=int)
 
     # Columns
     sgp_boards[1] = np.full( (sgp_size, sgp_size), np.arange(0, sgp_size))
@@ -16,11 +21,10 @@ def latin_to_SGP(sudoku_puzzle):
     sgp_boards[0] = np.transpose(sgp_boards[1])
 
     # Symbols
-    sgp_symbols = np.full((sudoku_puzzle.width * sudoku_puzzle.height), sudoku_puzzle.width * sudoku_puzzle.height * 4).tolist()
+    sgp_symbols = np.full(latin_square_size, latin_square_size * 4).tolist()
 
-    sgp_hint = np.tile(np.array(sudoku_puzzle.board), (2,2))
-
-    return SGP(sgp_symbols, sgp_boards.tolist(), solution_hints=sgp_hint)
+    sgp_hint = np.tile(np.array(latin_square_array), (2, 2))
+    return SGP(sgp_symbols, sgp_boards.tolist())
 
 
 def get_solution_tile(solution, tile=(0, 0)):

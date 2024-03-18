@@ -1,11 +1,39 @@
-import numpy
+import numpy as np
 from sudoku import Sudoku
 
 from puzzles import puzzles
 from SGP import SGP
 from reducers.sudoku_to_sgp import sudoku_to_SGP, is_solution_tiled, get_solution_tile
+from reducers.latin_to_SGP import latin_to_SGP
+
 from sgp_solver import Solve_SGP
 from visualizer.visualizer import visualize_SGP
+
+latin_square_array = np.array([
+    [1, None, 3],
+    [2, 3, None],
+    [3, 1, 2]
+])
+
+latin_square_array = np.full((3,3), None)
+
+
+puzzle = latin_to_SGP(latin_square_array)
+
+solutions = Solve_SGP(puzzle, get_all=False, log_progress=False)
+
+for solution_df in solutions:
+    solution = solution_df.sort_values(by=["row", "col"])
+    solution = solution.values.reshape((solution_df["row"].max() + 1, -1, 3))
+
+    solution = solution[:, :, 2] + 1
+    print(solution)
+
+#visualize_SGP(puzzle)
+
+"""
+Sudoku:
+
 
 width = 2
 height = 2
@@ -18,13 +46,13 @@ sudoku_solution.show()
 
 print("-------------")
 
+
+
 puzzle = sudoku_to_SGP(sudoku_puzzle)
 
-print(numpy.array(puzzle.boards))
 
-#visualize_SGP(puzzle)
 
-solutions = Solve_SGP(puzzle, get_all=True, log_progress=False)
+solutions = Solve_SGP(puzzle, get_all=True, log_progress=True)
 
 # Problems:
 # Not every "solution" is tiled
@@ -69,3 +97,4 @@ print("Total Solutions Found:", len(solutions))
 print("'Solutions' that are not valid sudoku:", not_valid_sudoku)
 print("'Solutions' that are not tiled:", not_tiled)
 print("Correct Solutions Found:", correct)
+"""
