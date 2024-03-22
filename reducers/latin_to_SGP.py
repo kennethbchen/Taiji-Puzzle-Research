@@ -40,13 +40,6 @@ def latin_to_SGP(latin_square_array):
 def tile_latin_square_array(latin_square_array):
     return np.array(latin_square_array).repeat(2, 1).repeat(2, 0)
 
-def get_solution_tile(solution, tile=(0, 0)):
-    # Assumes rectangular solution size
-
-    # (row, col)
-    tile_size = (int(len(solution) / 2), int(len(solution[0]) / 2))
-
-    tile_offset = (tile[0] * tile_size[0], tile[1] * tile_size[1])
-
-    return solution[tile_offset[0]: (tile_offset[0] + tile_size[0]), tile_offset[1]: (tile_offset[1] + tile_size[1])]
-
+# Takes a tiled SGP solution of a latin square and converts it to a latin square
+def untile_sgp_solution_array(tiled_lsa):
+    return tiled_lsa[0: len(tiled_lsa): 2, 0: len(tiled_lsa[0]): 2]
