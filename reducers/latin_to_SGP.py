@@ -21,9 +21,8 @@ def latin_to_SGP(latin_square_array):
 
     # Horizontal checkerboard (2 columns, 1 row)
 
-    row_id_offset = np.zeros( (sgp_size, latin_square_size, 2)) + np.arange(0, latin_square_size).reshape((latin_square_size, -1))
-    row_id_offset = row_id_offset.reshape((sgp_size, -1))
-    col_id_offset = np.zeros( (sgp_size, sgp_size) ) + np.arange(0, sgp_size * latin_square_size, latin_square_size).reshape((sgp_size, 1))
+    row_id_offset = np.arange(0, latin_square_size).repeat(2).reshape(1, -1).repeat(sgp_size, 0)
+    col_id_offset = np.arange(0, sgp_size * latin_square_size, latin_square_size).repeat(sgp_size).reshape((sgp_size, -1))
 
     sgp_boards[2] = row_id_offset + col_id_offset
 

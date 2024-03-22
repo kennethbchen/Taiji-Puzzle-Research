@@ -15,7 +15,7 @@ latin_square_array = np.array([
     [None, None, None]
 ])
 
-#latin_square_array = np.full((3,3), None)
+latin_square_array = np.full((3,3), None)
 
 
 puzzle = latin_to_SGP(latin_square_array)
