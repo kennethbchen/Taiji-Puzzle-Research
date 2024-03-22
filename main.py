@@ -10,17 +10,18 @@ from sgp_solver import Solve_SGP
 from visualizer.visualizer import visualize_SGP
 
 latin_square_array = np.array([
-    [1, None, 3],
-    [2, 3, None],
-    [3, 1, 2]
+    [1, None, None],
+    [2, None, None],
+    [None, None, None]
 ])
 
-latin_square_array = np.full((2,2), None)
+#latin_square_array = np.full((3,3), None)
 
 
 puzzle = latin_to_SGP(latin_square_array)
 
-solutions = Solve_SGP(puzzle, get_all=False, log_progress=False)
+
+solutions = Solve_SGP(puzzle, get_all=True, log_progress=False)
 
 for solution_df in solutions:
     solution = solution_df.sort_values(by=["row", "col"])
@@ -28,7 +29,8 @@ for solution_df in solutions:
 
     solution = solution[:, :, 2] + 1
     print(solution)
-
+    print()
+print(len(solutions), "solutions found.")
 #visualize_SGP(puzzle)
 
 """

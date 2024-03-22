@@ -9,7 +9,6 @@ import numpy as np
 def latin_to_SGP(latin_square_array):
     latin_square_size = latin_square_array.shape[0]
     sgp_size = latin_square_array.shape[0] * 2
-    print(latin_square_size, sgp_size)
 
     # Array of 4 boards where each number in a board is a distinct region
     sgp_boards = np.zeros((4, sgp_size, sgp_size), dtype=int)
@@ -33,11 +32,14 @@ def latin_to_SGP(latin_square_array):
     # Symbols
     sgp_symbols = np.full(latin_square_size, latin_square_size * 4).tolist()
 
-    sgp_hint = np.tile(np.array(latin_square_array), (2, 2))
+    sgp_hint = tile_latin_square_array(latin_square_array)
 
-    print(sgp_boards)
-    return SGP(sgp_symbols, sgp_boards.tolist())
+    return SGP(sgp_symbols, sgp_boards.tolist(), solution_hints=sgp_hint)
 
+# Takes an existing latin square and returns an array that represents how that latin square would look like
+# as an SGP
+def tile_latin_square_array(latin_square_array):
+    return np.array(latin_square_array).repeat(2, 1).repeat(2, 0)
 
 def get_solution_tile(solution, tile=(0, 0)):
     # Assumes rectangular solution size
@@ -49,31 +51,3 @@ def get_solution_tile(solution, tile=(0, 0)):
 
     return solution[tile_offset[0]: (tile_offset[0] + tile_size[0]), tile_offset[1]: (tile_offset[1] + tile_size[1])]
 
-
-def is_solution_tiled(solution):
-    # Assumes rectangular solution size
-
-    # (row, col)
-    tile_size = (int(len(solution)/2), int(len(solution[0])/2))
-
-    tile_positions = [(0, 0), (0, 1), (1, 0), (1, 1)]
-
-    origin_tile = None
-    for tile in tile_positions:
-
-        current_tile_data = get_solution_tile(solution, tile)
-
-        if origin_tile is None:
-            origin_tile = current_tile_data
-
-        if not (current_tile_data == origin_tile).all():
-
-            """
-            print("Origin tile and", tile, "are not the same")
-            print(origin_tile)
-            print("vs")
-            print(current_tile_data)
-            """
-            return False
-
-    return True
