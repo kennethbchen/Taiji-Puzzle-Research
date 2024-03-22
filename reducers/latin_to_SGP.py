@@ -8,11 +8,11 @@ import numpy as np
 # latin_square can be partially filled if certain values are None
 def latin_to_SGP(latin_square_array):
     latin_square_size = latin_square_array.shape[0]
-
     sgp_size = latin_square_array.shape[0] * 2
+    print(latin_square_size, sgp_size)
 
-    # Array of 2 boards where each number in a board is a distinct region
-    sgp_boards = np.zeros((2, sgp_size, sgp_size), dtype=int)
+    # Array of 4 boards where each number in a board is a distinct region
+    sgp_boards = np.zeros((4, sgp_size, sgp_size), dtype=int)
 
     # Columns
     sgp_boards[1] = np.full( (sgp_size, sgp_size), np.arange(0, sgp_size))
@@ -20,10 +20,22 @@ def latin_to_SGP(latin_square_array):
     # Rows
     sgp_boards[0] = np.transpose(sgp_boards[1])
 
+    # Horizontal checkerboard (2 columns, 1 row)
+
+    row_id_offset = np.zeros( (sgp_size, latin_square_size, 2)) + np.arange(0, latin_square_size).reshape((latin_square_size, -1))
+    row_id_offset = row_id_offset.reshape((sgp_size, -1))
+    col_id_offset = np.zeros( (sgp_size, sgp_size) ) + np.arange(0, sgp_size * latin_square_size, latin_square_size).reshape((sgp_size, 1))
+
+    sgp_boards[2] = row_id_offset + col_id_offset
+
+    sgp_boards[3] = sgp_boards[2].transpose()
+
     # Symbols
     sgp_symbols = np.full(latin_square_size, latin_square_size * 4).tolist()
 
     sgp_hint = np.tile(np.array(latin_square_array), (2, 2))
+
+    print(sgp_boards)
     return SGP(sgp_symbols, sgp_boards.tolist())
 
 
